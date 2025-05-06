@@ -1,28 +1,2 @@
 <!DOCTYPE html>
-
-{% block content %}
 <h1>Information</h1>
-{% for item in jobs%}
-
-<div class="col-md6 border rounded">
-    <h2> Action {{item.id}}</h2>
-    <table class="table">
-   <thead>
-     <tr>
-       <th scope="col">name</th>
-       <th scope="col">strana</th>
-       <th scope="col">work_time</th>
-       <th scope="col">date</th>
-     </tr>
-   </thead>
-   <tbody>
-     <tr>
-       <th scope="row">{{item.name}}</th>
-       <td>{{item.user.strana}}</td>
-       <td>{{item.work_time}}</td>
-       <td>{{item.date}}</td>
-     </tr>
-
-   </tbody>
- </table>
-</div>

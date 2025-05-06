@@ -1,6 +1,5 @@
 from datetime import datetime
-
-from flask import Flask, redirect
+from flask import Flask, redirect, url_for
 from data import db_session
 from flask import render_template
 from data.tabl import Tabls
@@ -75,9 +74,30 @@ def logout():
 
 @app.route("/")
 def index():
-    db_sess = db_session.create_session()
+    """db_sess = db_session.create_session()
     jobs = db_sess.query(Tabls).all()
-    return render_template("index.html", jobs=jobs)
+    return render_template("index.html", jobs=jobs)"""
+    return f"""<!doctype html>
+                    <html lang="en">
+                      <head>
+                        <meta charset="utf-8">
+
+                        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+                        <link rel="stylesheet" type="text/css" href="../static/css/style.css"/>
+      </head>
+                        <title>Информация</title>
+                      </head>
+                      <body>
+                        <h1><p align="center">Этот сайт посвящён игре "GeoGuessr"</p></h1>
+                        <img src="img/emb.webp alt="Фото"" 
+               alt="здесь должна была быть картинка, но не нашлась">
+
+                        <p>GeoGuessr — браузерная игра, разработанная шведским программистом Антоном Валленом. Выпущена 9 мая 2013 года. В игре используются карты Google Street View, игроку требуется угадать своё местоположение в мире на карте Google Maps.</p>
+                        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+                        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+                        crossorigin="anonymous"></script>
+                      </body>
+                    </html>"""
 
 
 def main():
