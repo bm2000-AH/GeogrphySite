@@ -4,8 +4,9 @@ from flask import Flask, redirect
 from data import db_session
 from flask import render_template
 from data.tabl import Tabls
+from data.users import User
 from forms.user import RegisterForm, LoginForm
-from forms.jobs import JobsForm
+from forms.gamers import GamerForm
 from flask_login import LoginManager, login_user, logout_user, login_required
 
 app = Flask(__name__)
@@ -55,7 +56,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        user = db_sess.query(Tabls).filter(Tabls.email == form.email.data).first()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
