@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Угадай город по карте</title>
+</head>
+<body>
+    <h1>Где это место?</h1>
+    <img src="{{ map_url }}" alt="Карта города"><br><br>
+    <form method="POST">
+        <label>Введите город:</label>
+        <input type="text" name="guess" required>
+        <button type="submit">Проверить</button>
+    </form>
+</body>
+</html>

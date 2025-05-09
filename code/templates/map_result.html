@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Результат</title>
+</head>
+<body>
+    {% if is_correct %}
+        <h1>Правильно!</h1>
+    {% else %}
+        <h1>Неправильно!</h1>
+        <p>Ты ввёл: {{ user_guess }}</p>
+        <p>Правильный ответ: {{ correct_city }}</p>
+    {% endif %}
+    <a href="/guess_map">Попробовать ещё</a>
+    <br>
+    <a href="/list_prof">Вернуться в меню</a>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+<head><title>Викторина по столицам</title></head>
+<body>
+  <h2>Какова столица страны: {{ country }}?</h2>
+  <form method="post">
+    {% for option in options %}
+      <input type="radio" name="answer" value="{{ option }}" required> {{ option }}<br>
+    {% endfor %}
+    <button type="submit">Ответить</button>
+  </form>
+</body>
+</html>
