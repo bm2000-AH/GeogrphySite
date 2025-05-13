@@ -113,11 +113,10 @@ def guess_capitals():
 
     if session['question'] == 5:
         score = session['score']
-        if current_user.is_authenticated:
-            db_sess = db_session.create_session()
-            user = db_sess.query(User).get(current_user.id)
-            user.score += score
-            db_sess.commit()
+        db_sess = db_session.create_session()
+        user = db_sess.get(User, current_user.id)
+        user.score += score
+        db_sess.commit()
         session.pop('score')
         session.pop('question')
         session.pop('asked')
@@ -273,6 +272,10 @@ def guess_flags():
 
     if session['question_flags'] == 5:
         score = session['score_flags']
+        db_sess = db_session.create_session()
+        user = db_sess.get(User, current_user.id)
+        user.score += score
+        db_sess.commit()
         session.pop('score_flags')
         session.pop('question_flags')
         session.pop('asked_flags')
@@ -309,7 +312,7 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
-    return db_sess.query(Tabls).get(user_id)
+    return db_sess.query(User).get(user_id)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -336,15 +339,19 @@ def register():
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
+        login_user(user)
         return redirect('/list_prof')
     return render_template('register.html', title='Регистрация', form=form)
 
 
-"""@app.route('/leaders')
-def leaders():
+@app.route('/leaders')
+def show_leaders():
     db_sess = db_session.create_session()
-    top_users = db_sess.query(User).order_by(User.score.desc()).limit(3).all()
-    return render_template('leaders.html', users=top_users)"""
+    leaders = db_sess.query(User).filter(User.score > 0).order_by(User.score.desc()).limit(10).all()
+
+    results = [(user.name, user.score) for user in leaders]
+
+    return render_template('leaders.html', results=results)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -366,12 +373,14 @@ def login():
 @login_required
 def logout():
     logout_user()
+    session.clear()
     return redirect("/")
 
 
 @app.route("/")
 def index():
-    return render_template('base.html', title='Главная страница')
+    form = RegisterForm()
+    return render_template('base.html', title='Главная страница', form=form)
 
 
 def main():
