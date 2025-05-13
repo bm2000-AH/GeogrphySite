@@ -24,17 +24,14 @@ def load_user(user_id):
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    print("ok")
     form = GamerForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
-            print("nice")
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Пароли не совпадают")
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
-            print("nm")
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
@@ -42,7 +39,6 @@ def register():
             name=form.name.data,
             email=form.email.data,
         )
-        print("pri")
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
