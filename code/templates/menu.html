@@ -1,13 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
     <title>Меню</title>
+    <style>
+        .logout-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .logout-button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
 </head>
 <body>
-    <h1>Добро пожаловать!</h1>
+    <a href="{{ url_for('register') }}" class="logout-button">Выйти</a>
+    <h1>Выберите режим:</h1>
     <ul>
-        <li><a href="{{ url_for('guess_capitals') }}">🧠 Угадай столицу</a></li>
-        <li><a href="{{ url_for('guess_map') }}">🗺️ Отгадать место по карте</a></li>
+        <li><a href="{{ url_for('guess_capitals') }}">Угадай столицу</a></li>
+        <li><a href="{{ url_for('guess_map') }}">Угадай по карте</a></li>
+        <li><a href="{{ url_for('guess_flags') }}">Угадай флаг</a></li>
     </ul>
 </body>
 </html>

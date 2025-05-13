@@ -1,9 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import random
 import requests
+import csv
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'geography_site_1804'
+
+flags_data = []
+
+with open('flags_extended.csv', encoding='utf-8') as f:
+    reader = csv.reader(f)
+    for row in reader:
+        if len(row) == 2:
+            country, code = row
+            flags_data.append((country.strip(), code.strip()))
 
 countries_and_capitals = {
     'Россия': 'Москва',
@@ -99,7 +109,9 @@ def guess_capitals():
 
     if session['question'] == 5:
         score = session['score']
-        session.clear()
+        session.pop('score')
+        session.pop('question')
+        session.pop('asked')
         return render_template('result.html', score=score)
 
     countries = list(countries_and_capitals.keys())
@@ -243,5 +255,48 @@ def guess_map():
     return render_template('map_guess.html', map_url=map_url)
 
 
+@app.route('/register')
+def register():
+    return render_template('register.html')
+
+
+@app.route('/guess_flags', methods=['GET', 'POST'])
+def guess_flags():
+    if 'score_flags' not in session:
+        session['score_flags'] = 0
+        session['question_flags'] = 0
+        session['asked_flags'] = []
+
+    if session['question_flags'] == 5:
+        score = session['score_flags']
+        session.pop('score_flags')
+        session.pop('question_flags')
+        session.pop('asked_flags')
+        return render_template('result.html', score=score)
+
+    options = [item for item in flags_data if item[0] not in session['asked_flags']]
+    country, code = random.choice(options)
+    correct_country = country
+
+    answer_options = [correct_country]
+    while len(answer_options) < 4:
+        option = random.choice(flags_data)[0]
+        if option not in answer_options:
+            answer_options.append(option)
+    random.shuffle(answer_options)
+
+    if request.method == 'POST':
+        selected = request.form.get('answer')
+        if selected == session.get('correct_flag_country'):
+            session['score_flags'] += 1
+        session['question_flags'] += 1
+        session['asked_flags'].append(session['correct_flag_country'])
+        return redirect(url_for('guess_flags'))
+
+    session['correct_flag_country'] = correct_country
+    flag_url = f"https://flagcdn.com/w320/{code.lower()}.png"
+    return render_template('flag_quiz.html', flag_url=flag_url, options=answer_options)
+
+
 if __name__ == '__main__':
-    app.run(port=8880, host='127.0.0.1')
+    app.run(port=8881, host='127.0.0.1')
