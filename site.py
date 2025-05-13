@@ -40,8 +40,7 @@ def register():
                                    message="Такой пользователь уже есть")
         user = User(
             name=form.name.data,
-            email=form.email.data,
-            password=form.password.data
+            email=form.email.data
         )
         print("pri")
         user.set_password(form.password.data)
@@ -78,7 +77,7 @@ def index():
     """db_sess = db_session.create_session()
     jobs = db_sess.query(Tabls).all()
     return render_template("index.html", jobs=jobs)"""
-    return render_template('index.html', title='Главная страница')
+    return render_template('base.html', title='Главная страница')
 
 
 def main():

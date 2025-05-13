@@ -1,15 +1,16 @@
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, EmailField, BooleanField, IntegerField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Email
 import sqlalchemy
 
 
 class GamerForm(FlaskForm):
-    """id = StringField('Number', validators=[DataRequired()])"""
-    name = StringField('Name', validators=[DataRequired()])
-    email = IntegerField('Email')
-    password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    submit = SubmitField('Войти')
+    name = StringField('Имя', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
+    submit = SubmitField('Зарегестрироваться')
+
 
 class LoginForm(FlaskForm):
     email = EmailField('Почта', validators=[DataRequired()])
