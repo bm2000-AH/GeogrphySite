@@ -76,7 +76,7 @@ def logout():
 def index():
     form = LoginForm()
     if form.validate_on_submit():
-
+        return render_template('bases.html', title='Главная страница')
     """db_sess = db_session.create_session()
     jobs = db_sess.query(Tabls).all()
     return render_template("index.html", jobs=jobs)"""
