@@ -58,7 +58,7 @@ def login():
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            return redirect("/")
+            return redirect("/list_prof")
         return render_template('login.html',
                                message="Неправильный логин или пароль",
                                form=form)
@@ -74,12 +74,6 @@ def logout():
 
 @app.route("/")
 def index():
-    form = LoginForm()
-    if form.validate_on_submit():
-        return render_template('bases.html', title='Главная страница')
-    """db_sess = db_session.create_session()
-    jobs = db_sess.query(Tabls).all()
-    return render_template("index.html", jobs=jobs)"""
     return render_template('base.html', title='Главная страница')
 
 
