@@ -1,8 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import random
+from data import db_session
 import requests
+from datetime import datetime
 import csv
+from data.tabl import Tabls
+from data.users import User
+from forms.user import RegisterForm, LoginForm
+from forms.gamers import GamerForm
+from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import current_user
 
+db_session.global_init("db/names.db")
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'geography_site_1804'
 
@@ -90,11 +99,6 @@ countries_and_capitals = {
 }
 
 
-@app.route('/')
-def index():
-    return render_template('menu.html')
-
-
 @app.route('/list_prof')
 def list_prof():
     return render_template('menu.html')
@@ -109,6 +113,11 @@ def guess_capitals():
 
     if session['question'] == 5:
         score = session['score']
+        if current_user.is_authenticated:
+            db_sess = db_session.create_session()
+            user = db_sess.query(User).get(current_user.id)
+            user.score += score
+            db_sess.commit()
         session.pop('score')
         session.pop('question')
         session.pop('asked')
@@ -255,11 +264,6 @@ def guess_map():
     return render_template('map_guess.html', map_url=map_url)
 
 
-@app.route('/register')
-def register():
-    return render_template('register.html')
-
-
 @app.route('/guess_flags', methods=['GET', 'POST'])
 def guess_flags():
     if 'score_flags' not in session:
@@ -296,6 +300,83 @@ def guess_flags():
     session['correct_flag_country'] = correct_country
     flag_url = f"https://flagcdn.com/w320/{code.lower()}.png"
     return render_template('flag_quiz.html', flag_url=flag_url, options=answer_options)
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    db_sess = db_session.create_session()
+    return db_sess.query(Tabls).get(user_id)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    print("ok")
+    form = GamerForm()
+    if form.validate_on_submit():
+        if form.password.data != form.password_again.data:
+            print("nice")
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Пароли не совпадают")
+        db_sess = db_session.create_session()
+        if db_sess.query(User).filter(User.email == form.email.data).first():
+            print("nm")
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Такой пользователь уже есть")
+        user = User(
+            name=form.name.data,
+            email=form.email.data,
+        )
+        print("pri")
+        user.set_password(form.password.data)
+        db_sess.add(user)
+        db_sess.commit()
+        return redirect('/list_prof')
+    return render_template('register.html', title='Регистрация', form=form)
+
+
+"""@app.route('/leaders')
+def leaders():
+    db_sess = db_session.create_session()
+    top_users = db_sess.query(User).order_by(User.score.desc()).limit(3).all()
+    return render_template('leaders.html', users=top_users)"""
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember_me.data)
+            return redirect("/list_prof")
+        return render_template('login.html',
+                               message="Неправильный логин или пароль",
+                               form=form)
+    return render_template('login.html', title='Авторизация', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
+
+@app.route("/")
+def index():
+    return render_template('base.html', title='Главная страница')
+
+
+def main():
+    db_session.global_init("db/names.db")
+    app.run()
 
 
 if __name__ == '__main__':

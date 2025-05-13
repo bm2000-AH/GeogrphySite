@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Таблица лидеров</title>
+</head>
+<body>
+    <h1>🏆 Таблица лидеров</h1>
+
+    {% if results %}
+        <ul>
+            {% for game, score in results %}
+                <li>{{ game }} — {{ score }} очков</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Лидеры пока не определены.</p>
+    {% endif %}
+
+    <p><a href="{{ url_for('list_prof') }}">⬅ Назад в меню</a></p>
+</body>
+</html>
