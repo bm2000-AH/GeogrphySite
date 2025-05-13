@@ -1,7 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, EmailField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, Email
-import sqlalchemy
 
 
 class GamerForm(FlaskForm):

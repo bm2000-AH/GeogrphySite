@@ -4,18 +4,6 @@
     <meta charset="UTF-8">
     <title>Меню</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-image: url("{{ url_for('static', filename='images/world_map.jpg') }}");
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center top 0px;
-            font-family: sans-serif;
-            color: white;
-            text-shadow: 1px 1px 3px black;
-        }
-
         .logout-button {
             position: absolute;
             top: 10px;
@@ -26,32 +14,19 @@
             text-decoration: none;
             border-radius: 5px;
         }
-
         .logout-button:hover {
             background-color: #d32f2f;
-        }
-
-        h1, ul, p {
-            margin-left: 30px;
-        }
-
-        a {
-            color: #ffcc00;
-        }
-
-        a:hover {
-            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <a href="{{ url_for('logout') }}" class="logout-button">Выйти</a>
+    <a href="{{ url_for('index') }}" class="logout-button">Выйти</a>
     <h1>Выберите режим:</h1>
     <ul>
         <li><a href="{{ url_for('guess_capitals') }}">Угадай столицу</a></li>
         <li><a href="{{ url_for('guess_map') }}">Угадай по карте</a></li>
         <li><a href="{{ url_for('guess_flags') }}">Угадай флаг</a></li>
     </ul>
-    <p><a href="{{ url_for('show_leaders') }}">Таблица лидеров</a></p>
+
 </body>
 </html>

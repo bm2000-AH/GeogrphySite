@@ -104,6 +104,7 @@ def list_prof():
     return render_template('menu.html')
 
 
+
 @app.route('/guess_capitals', methods=['GET', 'POST'])
 def guess_capitals():
     if 'score' not in session:
@@ -115,7 +116,8 @@ def guess_capitals():
         score = session['score']
         db_sess = db_session.create_session()
         user = db_sess.get(User, current_user.id)
-        user.score += score
+        user.score = score
+        print(f"[DEBUG] {user.name} — Новый счёт: {user.score}")
         db_sess.commit()
         session.pop('score')
         session.pop('question')
@@ -133,6 +135,8 @@ def guess_capitals():
         if capital not in options:
             options.append(capital)
     random.shuffle(options)
+
+
 
     if request.method == 'POST':
         selected = request.form.get('answer')
@@ -250,6 +254,8 @@ def guess_map():
         user_guess = request.form['guess'].strip().lower()
         correct_city = session.get('correct_city', '').lower()
 
+
+
         is_correct = user_guess == correct_city
         return render_template('map_result.html', is_correct=is_correct,
                                correct_city=session.get('correct_city'),
@@ -272,10 +278,6 @@ def guess_flags():
 
     if session['question_flags'] == 5:
         score = session['score_flags']
-        db_sess = db_session.create_session()
-        user = db_sess.get(User, current_user.id)
-        user.score += score
-        db_sess.commit()
         session.pop('score_flags')
         session.pop('question_flags')
         session.pop('asked_flags')
@@ -354,6 +356,7 @@ def show_leaders():
     return render_template('leaders.html', results=results)
 
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -373,14 +376,12 @@ def login():
 @login_required
 def logout():
     logout_user()
-    session.clear()
     return redirect("/")
 
 
 @app.route("/")
 def index():
-    form = RegisterForm()
-    return render_template('base.html', title='Главная страница', form=form)
+    return render_template('base.html', title='Главная страница')
 
 
 def main():
