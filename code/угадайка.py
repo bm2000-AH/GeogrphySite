@@ -105,50 +105,47 @@ def list_prof():
 
 
 
-@app.route('/guess_capitals', methods=['GET', 'POST'])
+@app.route('/game/capitals', methods=['GET', 'POST'])
 def guess_capitals():
     if 'score' not in session:
         session['score'] = 0
         session['question'] = 0
         session['asked'] = []
 
-    if session['question'] == 5:
-        score = session['score']
-        db_sess = db_session.create_session()
-        user = db_sess.get(User, current_user.id)
-        user.score = score
-        print(f"[DEBUG] {user.name} — Новый счёт: {user.score}")
-        db_sess.commit()
-        session.pop('score')
-        session.pop('question')
-        session.pop('asked')
-        return render_template('result.html', score=score)
-
     countries = list(countries_and_capitals.keys())
-    ostalis = list(set(countries) - set(session['asked']))
-    country = random.choice(ostalis)
-    correct_capital = countries_and_capitals[country]
+    country = random.choice(countries)
 
-    options = [correct_capital]
-    while len(options) < 4:
-        capital = random.choice(list(countries_and_capitals.values()))
-        if capital not in options:
-            options.append(capital)
+    while country in session['asked']:
+        country = random.choice(countries)
+
+    correct_capital = countries_and_capitals[country]
+    capitals = list(countries_and_capitals.values())
+    options = random.sample([c for c in capitals if c != correct_capital], 3)
+    options.append(correct_capital)
     random.shuffle(options)
 
-
-
     if request.method == 'POST':
-        selected = request.form.get('answer')
-        if selected == session['correct']:
+        user_guess = request.form.get('capital')
+        correct_capital = request.form.get('correct_capital')
+        is_correct = user_guess == correct_capital
+        if is_correct:
             session['score'] += 1
         session['question'] += 1
-        session['asked'].append(session['current_country'])
-        return redirect(url_for('guess_capitals'))
+        session['asked'].append(request.form.get('country'))
 
-    session['correct'] = correct_capital
-    session['current_country'] = country
-    return render_template('capital_quiz.html', country=country, options=options)
+        if session['question'] == 5:
+            score = session['score']
+            if current_user.is_authenticated:
+                db_sess = db_session.create_session()
+                user = db_sess.get(User, current_user.id)
+                user.score += score
+                db_sess.commit()
+            session.pop('score')
+            session.pop('question')
+            session.pop('asked')
+            return render_template('result.html', score=score)
+
+    return render_template('capital_quiz.html', country=country, options=options, correct_capital=correct_capital)
 
 
 coords_city = [
@@ -278,6 +275,11 @@ def guess_flags():
 
     if session['question_flags'] == 5:
         score = session['score_flags']
+        if current_user.is_authenticated:
+            db_sess = db_session.create_session()
+            user = db_sess.get(User, current_user.id)
+            user.score += score
+            db_sess.commit()
         session.pop('score_flags')
         session.pop('question_flags')
         session.pop('asked_flags')
